@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리들의 세빛 이야기</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Nanum+Pen+Script&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+
+    <style>
+
+/* 📝 [TAB 2.5] 세빛 퀴즈 전용 스타일 세트 (완벽한 모바일 핏 & 정중앙 정렬) */
+#content-quiz {
+    display: none;
+    box-sizing: border-box;
+    padding: 25px 20px 120px 20px !important;
+
+    /* 🟢 절대 위치를 유지하되, 부모(app-container)의 모바일 너비인 480px 안에 가두고 정중앙 배치합니다 */
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    width: 100%;
+    max-width: 480px; /* 다른 탭들과 완벽하게 일치하는 모바일 너비 강제 고정! */
+
+    background-color: #eeeeee; /* 요정하신 회색빛 배경 유지 */
+    min-height: 100vh;
+}
+
+/* 🟢 세빛 퀴즈 탭이 활성화되었을 때만 화면을 정상적으로 덮도록 설정 */
+#content-quiz.tab-content.active {
+    display: block !important;
+}
+
+        /* 🟢 로컬 폴더에 있는 kyobo.woff 파일을 직접 불러옵니다. */
+        @font-face {
+            font-family: 'LocalKyobo';
+            src: url('kyobo.woff') format('woff');
+            /* 👈 동일 폴더에 있으므로 파일이름만 딱 적어주면 끝! */
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --bg-color: #f3f3f3;
+            --app-bg: #ffffff;
+            --text-main: #222222;
+            --text-muted: #666666;
+            --poster-blue: #1e4ba8;
+            --poster-red: #c93b3b;
+            --handwriting: 'Nanum Pen Script', cursive;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            font-family: 'Apple SD Gothic Neo', sans-serif;
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: var(--app-bg);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.06);
+            padding-bottom: 90px;
+            box-sizing: border-box;
+        }
+
+        .home-hero {
+            position: relative;
+            width: 100%;
+            padding-top: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-title-box {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .hero-title-box h1 {
+            font-family: 'Black Han Sans', sans-serif;
+            font-weight: 300;
+            font-size: 36px;
+            margin: 0 0 5px 0;
+            color: var(--poster-blue);
+            letter-spacing: -3px;
+        }
+
+        .hero-title-box p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin: 0;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .main-photo-wrap {
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .polaroid-card {
+            background: #ffffff;
+            padding: 10px 10px 25px 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07);
+            transform: rotate(-1deg);
+            display: inline-block;
+            max-width: 82%;
+            position: relative;
+            border: 1px solid #f0f0f0;
+        }
+
+        .main-polaroid {
+            animation: gentleWiggle 3.5s ease-in-out infinite alternate;
+            transform-origin: top center;
+        }
+
+        @keyframes gentleWiggle {
+            0% {
+                transform: rotate(-2deg);
+            }
+
+            100% {
+                transform: rotate(1.5deg);
+            }
+        }
+
+        .polaroid-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .polaroid-card .caption {
+            font-family: var(--handwriting);
+            font-size: 24px;
+            color: var(--poster-red);
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .tape-deco {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            background: #ccc;
+            border-radius: 50%;
+            box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.3), 1px 2px 3px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+
+        .home-footer-note {
+            text-align: center;
+            font-family: var(--handwriting);
+            font-size: 24px;
+            color: var(--poster-blue);
+            margin: 20px 0 30px 0;
+            cursor: pointer;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-5px);
+            }
+
+            60% {
+                transform: translateY(-2px);
+            }
+        }
+
+        .main-nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: space-around;
+            padding: 14px 0;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.04);
+            z-index: 100;
+            border-top: 1px solid #eeeeee;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            font-size: 13px;
+            font-weight: bold;
+            color: #999999;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .nav-btn .icon {
+            font-size: 16px;
+            opacity: 0.5;
+        }
+
+        .nav-btn.active {
+            color: var(--poster-blue);
+        }
+
+        .nav-btn.active .icon {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 25px 20px 40px 20px;
+            box-sizing: border-box;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px 10px;
+            padding: 10px 0;
+        }
+
+        .team-member-card {
+            background: #ffffff;
+            padding: 6px 6px 12px 6px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f0f0f0;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .team-member-card img {
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            object-fit: cover;
+            display: block;
+        }
+
+        .team-member-name {
+            font-family: var(--handwriting);
+            font-size: 18px;
+            color: var(--text-main);
+            text-align: center;
+            margin-top: 6px;
+        }
+
+        .team-grid .team-member-card:nth-child(3n+1) {
+            transform: rotate(-1.5deg) translateY(2px);
+        }
+
+        .team-grid .team-member-card:nth-child(3n+2) {
+            transform: rotate(2deg) translateY(-1px);
+        }
+
+        .team-grid .team-member-card:nth-child(3n+3) {
+            transform: rotate(-1deg) translateY(3px);
+        }
+
+        .member-tag {
+            font-size: 11px;
+            color: var(--poster-red);
+            text-align: center;
+            margin-top: -4px;
+            font-weight: bold;
+        }
+
+        .doodle-line {
+            position: absolute;
+            font-family: var(--handwriting);
+            font-size: 18px;
+            z-index: 5;
+            white-space: nowrap;
+        }
+
+        .doodle-y {
+            color: var(--poster-blue);
+        }
+
+        .doodle-p {
+            color: var(--poster-red);
+        }
+
+        .sub-day-tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 35px;
+            border-bottom: 1px solid #eeeeee;
+            padding-bottom: 8px;
+        }
+
+        .sub-tab {
+            background: none;
+            border: none;
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 18px;
+            color: #bbb;
+            padding: 5px 12px;
+            cursor: pointer;
+            letter-spacing: -0.5px;
+            transition: all 0.2s;
+        }
+
+        .sub-tab.active {
+            color: var(--poster-blue);
+            font-size: 20px;
+            border-bottom: 3px solid var(--poster-blue);
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 15px;
+            border-left: 1px solid #e0e0e0;
+            margin-left: 10px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .timeline-node {
+            position: absolute;
+            left: -21px;
+            top: 5px;
+            width: 9px;
+            height: 9px;
+            background-color: var(--poster-blue);
+            border-radius: 50%;
+        }
+
+        .time-badge {
+            font-size: 12px;
+            color: var(--poster-blue);
+            font-weight: bold;
+            margin-bottom: 4px;
+            text-align: left;
+            padding-left: 10px;
+        }
+
+        .item-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0 0 15px 0;
+            color: #333;
+            text-align: left;
+            padding-left: 10px;
+        }
+
+        .timeline .polaroid-card {
+            max-width: 88%;
+        }
+
+        /* 🟢 사역일지 캡션에 로컬 폰트를 강제 적용합니다 */
+        .timeline .polaroid-caption {
+            font-family: 'LocalKyobo', sans-serif !important;
+            font-size: 21px !important;
+            /* 교보체 크기에 맞게 미세 조율 */
+            color: #000000 !important;
+            text-align: center;
+            line-height: 1.4;
+            margin-top: 15px;
+            padding: 0 5px;
+        }
+
+        .placeholder-text {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.98);
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 80%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+        }
+
+        #content-home {
+            background-color: #eeeeee;
+            min-height: 100vh;
+            margin: 0;
+            padding-bottom: 40px;
+        }
+
+        #content-team {
+            background-color: #eeeeee;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        #content-diary {
+            background-color: #eeeeee;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .slider-wrap {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            padding: 10px 0 25px 0;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .slider-wrap .polaroid-card {
+            flex: 0 0 80%;
+            scroll-snap-align: center;
+            margin: 0 !important;
+            transform: none !important;
+        }
+
+        .slider-wrap::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .slider-wrap::-webkit-scrollbar-thumb {
+            background-color: #dddddd;
+            border-radius: 10px;
+        }
+
+        .slider-wrap::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* 📝 [TAB 3] 기도의 벽 전용 방명록 스타일 세트 (중앙 배치 완벽 마감) */
+        #content-guestbook {
+            display: none;
+            box-sizing: border-box;
+            padding: 25px 20px 120px 20px !important;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff;
+            min-height: 100vh;
+        }
+
+        #content-guestbook.tab-content.active {
+            display: block !important;
+        }
+
+        .input-section {
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .input-row-top {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #name-input {
+            flex: 1.3;
+            min-width: 0;
+        }
+
+        #password-input {
+            flex: 1;
+            min-width: 0;
+            font-size: 13px;
+        }
+
+        #emoji-select {
+            flex: 1;
+            min-width: 0;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .input-row-bottom {
+            display: flex;
+            gap: 8px;
+        }
+
+        #message-input {
+            flex-grow: 1;
+            font-size: 14px;
+        }
+
+        #submit-button {
+            width: 75px;
+            background-color: var(--poster-blue);
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .custom-input {
+            height: 42px;
+            padding: 0 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            box-sizing: border-box;
+        }
+
+        #guestbook-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #guestbook-list li {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        .list-emoji {
+            margin-right: 12px;
+            font-size: 1.4em;
+        }
+
+        .list-name {
+            font-family: var(--handwriting);
+            font-size: 20px;
+            color: var(--poster-blue);
+            margin-right: 12px;
+            padding-right: 12px;
+            border-right: 1px solid #eee;
+            min-width: 60px;
+            white-space: nowrap;
+        }
+
+        .list-msg {
+            font-family: var(--handwriting);
+            font-size: 22px;
+            color: #333;
+            flex-grow: 1;
+            word-break: break-all;
+            text-align: left;
+            line-height: 1.2;
+            padding-top: 4px;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+            margin-left: 5px;
+        }
+
+        .delete-btn:hover {
+            color: var(--poster-red);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <div id="content-home" class="tab-content active">
+            <div class="home-hero">
+                <div class="hero-title-box">
+                    <p>2026 더깊은 청년부 국내선교 세빛팀</p>
+                    <p>💫</p>
+                    <h1>우리들의 세빛 이야기</h1>
+                </div>
+            </div>
+
+            <div class="main-photo-wrap">
+                <div class="main-polaroid polaroid-card">
+                    <div class="tape-deco"></div>
+                    <img src="photo/단체_바다.JPG" alt="세빛교회 선교팀 단체사진" onclick="zoomImage(this)">
+                    <div class="caption">🤍세빛 냐호✌🏻💞</div>
+                </div>
+                <div class="doodle-line doodle-y"
+                    style="top: 15px; right: 25px; transform: rotate(8deg); font-size: 20px;">0702-0705⛪️</div>
+            </div>
+
+
+            <!-- 🟢 여기에 사진 드라이브 바로가기 버튼 추가 -->
+            <div style="text-align: center; margin: 30px 0 50px 0;">
+                <a href="https://drive.google.com/drive/folders/1J0p7KFYAzNxHHqKDUGAQHiErTMKXyb9r?usp=drive_link" target="_blank" style="display: inline-block; background: var(--poster-blue); color: white; text-decoration: none; padding: 15px 30px; font-size: 15px; font-weight: bold; border-radius: 30px; box-shadow: 0 4px 15px rgba(30, 75, 168, 0.3); font-family: 'Apple SD Gothic Neo', sans-serif; animation: bounce 2s infinite;">
+                    📸 선교 사진 드라이브 바로가기 💾
+                </a>
+            </div>
+
+        </div>
+
+        <div id="content-team" class="tab-content">
+            <h2
+                style="font-family: 'Gamja Flower'; text-align: center; color: var(--poster-blue); font-size: 28px; margin-bottom: 25px;">
+                반짝이는 우리 팀원들</h2>
+            <div class="team-grid">
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/박지훈.JPG" alt="팀원 01">
+                    <div class="team-member-name">박지훈 전도사님</div>
+                    <div class="member-tag">전도/교육팀</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/임대성1.JPG" alt="팀원 02">
+                    <div class="team-member-name">임대성 부감님</div>
+                    <div class="member-tag">주방팀</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/김세은.png" alt="팀원 03">
+                    <div class="team-member-name">김세은</div>
+                    <div class="member-tag">사역장/교육팀</div>
+                    <div class="doodle-line doodle-p" style="top:-8px; right:-5px; font-size: 13px;">우리대장♥</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/김재국1.png" alt="팀원 04">
+                    <div class="team-member-name">김재국</div>
+                    <div class="member-tag">총무/주방팀</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/홍하림.JPG" alt="팀원 05">
+                    <div class="team-member-name">홍하림</div>
+                    <div class="member-tag">회계/전도팀</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/김윤지.png" alt="팀원 06">
+                    <div class="team-member-name">김윤지</div>
+                    <div class="member-tag">서기/전도팀</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/곽소영.png" alt="팀원 07">
+                    <div class="team-member-name">곽소영</div>
+                    <div class="member-tag">전도팀장</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/윤슬기.jpg" alt="팀원 08">
+                    <div class="team-member-name">윤슬기</div>
+                    <div class="member-tag">교육팀장</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/이규원.jpg" alt="팀원 09">
+                    <div class="team-member-name">이규원</div>
+                    <div class="member-tag">주방팀장</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/강반석.jpg" alt="팀원 10">
+                    <div class="team-member-name">강반석</div>
+                    <div class="member-tag">교육팀</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/권이준.png" alt="팀원 11">
+                    <div class="team-member-name">권이준</div>
+                    <div class="member-tag">전도팀/막내</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/김린.jpg" alt="팀원 12">
+                    <div class="team-member-name">김린</div>
+                    <div class="member-tag">교육팀</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/김한재.png" alt="팀원 13">
+                    <div class="team-member-name">김한재</div>
+                    <div class="member-tag">전도팀</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/안소연.png" alt="팀원 14">
+                    <div class="team-member-name">안소연</div>
+                    <div class="member-tag">주방팀</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/이예인.png" alt="팀원 15">
+                    <div class="team-member-name">이예인</div>
+                    <div class="member-tag">교육팀</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/이종윤.png" alt="팀원 16">
+                    <div class="team-member-name">이종윤</div>
+                    <div class="member-tag">전도팀</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/이준형.png" alt="팀원 17">
+                    <div class="team-member-name">이준형</div>
+                    <div class="member-tag">전도팀</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/이해준.JPG" alt="팀원 18">
+                    <div class="team-member-name">이해준</div>
+                    <div class="member-tag">주방팀/막내</div>
+                </div>
+                <div class="team-member-card">
+                    <div class="tape-deco"></div><img src="photo/팀원/홍은서.JPG" alt="팀원 19">
+                    <div class="team-member-name">홍은서</div>
+                    <div class="member-tag">전도팀</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-diary" class="tab-content">
+            <div class="sub-day-tabs">
+                <button class="sub-tab active" id="sub-btn-1" onclick="changeSubDay(1)">Day 1</button>
+                <button class="sub-tab" id="sub-btn-2" onclick="changeSubDay(2)">Day 2</button>
+                <button class="sub-tab" id="sub-btn-3" onclick="changeSubDay(3)">Day 3</button>
+                <button class="sub-tab" id="sub-btn-4" onclick="changeSubDay(4)">Day 4</button>
+            </div>
+
+            <div class="timeline day-feed" id="feed-day1">
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ AM 12:00</div>
+                    <h3 class="item-title">소망교회 출발 예배</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day1/1출발예배.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">본당 지하2층 예배실 출발 예배</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day1/1단체사진.JPG" class="polaroid-img"
+                                onclick="zoomImage(this)">
+                            <div class="polaroid-caption">잘 다녀오겠습니다 🤍</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 01:30</div>
+                    <h3 class="item-title">삼척으로 이동</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day1/2출발.PNG" class="polaroid-img">
+                            <div class="polaroid-caption">삼척으로 출발. 아직은 어색한 우리.</div>
+                            <div class="doodle-line doodle-p"
+                                style="right: -10px; bottom: 15px; transform: rotate(5deg);">가보자고!🚗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day1/2쥰도사님.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">앉자마자 자는 쥰도사님.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 05:15</div>
+                    <h3 class="item-title">세빛, 임원, 장호 모여 저녁식사</h3>
+                    <div class="polaroid-card">
+                        <div class="tape-deco"></div><img src="photo/Day1/3곰탕.JPG" class="polaroid-img">
+                        <div class="polaroid-caption">'백곰탕'에서 저녁 식사</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 06:20</div>
+                    <h3 class="item-title">세빛 교육관</h3>
+                    <div class="polaroid-card">
+                        <div class="tape-deco"></div><img src="photo/Day1/2-2_쥰.jpg" class="polaroid-img">
+                        <div class="polaroid-caption">교육관 먼저 들려 짐 내리구</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 07:00</div>
+                    <h3 class="item-title">드디어 세빛 도착</h3>
+                    <div class="polaroid-card">
+                        <div class="tape-deco"></div><img src="photo/Day1/4세빛도착.JPG" class="polaroid-img">
+                        <div class="polaroid-caption">아직 멀끔한 우리.</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 07:00</div>
+                    <h3 class="item-title">사역의 시작, 물품 정리</h3>
+                    <div class="polaroid-card">
+                        <div class="tape-deco"></div><img src="photo/Day1/5전도물품패킹.png" class="polaroid-img">
+                        <div class="polaroid-caption">전도 물품 추가로 세팅하고, 짐 정리하고</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 09:40</div>
+                    <h3 class="item-title">첫날 밤의 저녁 경건회</h3>
+                    <div class="polaroid-card">
+                        <div class="tape-deco"></div><img src="photo/Day1/6저녁경건회.JPG" class="polaroid-img">
+                        <div class="polaroid-caption">신대용 목사님과의 첫날 밤 경건회</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⚠️</div>
+                    <h3 class="item-title">오이냉국사건</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day1/7식초재국.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">식초냉국사건</div>
+                            <div class="doodle-line doodle-p"
+                                style="right: -10px; bottom: 8px; font-size: 20px; font-weight: bold; transform: rotate(10deg);">
+                                너네 다 들어가!🚨 </div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day1/7오이냉국.png" class="polaroid-img">
+                            <div class="polaroid-caption">국자냉국사건</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ 새벽</div>
+                    <h3 class="item-title">세은이 도착</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day1/8세은도착.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">많은 짐을 짊어진 사역장의 무게란</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day1/8고라니.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">재국 세은이 본 고라ㄴ,,아니 사슴</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ⏩ 여기에 Next Day 버튼 추가 -->
+                <div style="text-align: center; margin: 40px 0 20px 0;">
+                    <button type="button" onclick="changeSubDay(2)"
+                        style="background: var(--poster-blue); color: white; border: none; padding: 12px 24px; font-size: 15px; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-family: 'Apple SD Gothic Neo', sans-serif;">
+                        Next Day (Day 2) →
+                    </button>
+                </div>
+
+
+            </div>
+
+            <div class="timeline day-feed" id="feed-day2" style="display: none;">
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ AM 07:00 - 08:15</div>
+                    <h3 class="item-title">든든한 아침</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/1미녀.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">미녀는 잠꾸러기라더니</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/1샌드위치.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">아침 : 샌드위치</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/1감자.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">아침 감자가 최고지</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ AM 08:15 - AM 08:30</div>
+                    <h3 class="item-title">아침경건회</h3>
+                    <div class="polaroid-card">
+                        <div class="tape-deco"></div>
+                        <img src="photo/Day2/2아침경건회.JPG" class="polaroid-img">
+                        <div class="polaroid-caption">🎶 청년의 기도 <br> 📙 듣다 : 주의 음성에 머물다 <br>(사무엘상 15장 20-23절)</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ AM 09:10 - PM 19:30</div>
+                    <h3 class="item-title">교육팀의 하루</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/3교육관데코.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">교육관 데코 시작</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/3포토부스.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">인기만점 포토부스</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/3정종현님.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">종현님도 팀세빛✨</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/3대장님과포토부스.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">대장님 첫 인생네컷</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/3신목사님의붕어빵.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">신목사님의 붕어빵</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/3소연해준은서.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">소연,해준,은서,(예인)도 무사도착</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/3신목사님아드님아님.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">혹시 신목사님 막내아들?🤣</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/3아이들과.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">아이들과 수다</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ AM 09:10 - PM 19:30</div>
+                    <h3 class="item-title">전도팀의 하루</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/4시작기도.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">흩어지기 전 기도하고 출발</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/4전도물품.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">사랑은전도물품가득싣고</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/4두팀.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">팀소영/팀하영(사모님)</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/4자동차전도.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">차도 멈춰 세우는 전도 열정</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/4수박.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">복음 전하러 왔다가<br>사랑받고 가지요</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/day2/4지혜전도.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">지혜전도</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/day2/4느좋.PNG" class="polaroid-img">
+                            <div class="polaroid-caption">느좋전도</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/day2/4꿀물.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">💞</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ AM 13:00 - PM 14:00</div>
+                    <h3 class="item-title">점심</h3>
+
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/day2/5부찌.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">점심 : 부대찌개&계란말이</div>
+                        </div>
+
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/5주방팀점심.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">해주니와 대성부감님</div>
+                        </div>
+
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/5잘먹겠습니다.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">잘 먹겠습니다!</div>
+                        </div>
+
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/5드디어꾸기밥.PNG" class="polaroid-img">
+                            <div class="polaroid-caption">꾸기도 밥먹자~</div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">📌</div>
+                    <h3 class="item-title">김경진 목사님의 반가운 방문</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/6교육관.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">대장님 교육관 도착</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/6소망과세빛.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">소망과 세빛의 대장</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/6교육관체험.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">✨</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/6무지개메세지.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💞</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/6교회도착.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">대장님 교회 도착</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/6교회탐방.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">🌟</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/6두대장님의야호.PNG" class="polaroid-img">
+                            <div class="polaroid-caption">두 대장님의 야호✌️</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/6국선부야호.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">국선부 배웅 때도 야호✌️</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 19:30 - 20:30</div>
+                    <h3 class="item-title">저녁 식사</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/day2/7닭볶음탕.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">저녁 :닭볶음탕</div>
+                        </div>
+
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/7잘먹겟습니다.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">감사히 잘 먹었습니다♡</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 20:30 - 22:00</div>
+                    <h3 class="item-title">경건회, 그룹 나눔</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/8경건회.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">🎶 나를 부르신 주 <br> 📙 먹다 : 영혼을 채우다 <br>(요한복음 6장 35-40절)</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/8그룹나눔.jpg" class="polaroid-img">
+                            <div class="polaroid-caption"><br>깊은 나눔의 밤🌙</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 22:00 -</div>
+                    <h3 class="item-title">야식타임</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/9야식타임.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">세기의 고기 대결</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/9대성.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">대성 셰프</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day2/9반석.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">반석 셰프</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ⏩ 여기에 Next Day 버튼 추가 -->
+                <div style="text-align: center; margin: 40px 0 20px 0;">
+                    <button type="button" onclick="changeSubDay(3)"
+                        style="background: var(--poster-blue); color: white; border: none; padding: 12px 24px; font-size: 15px; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-family: 'Apple SD Gothic Neo', sans-serif;">
+                        Next Day (Day 3) →
+                    </button>
+                </div>
+            </div>
+
+            <div class="timeline day-feed" id="feed-day3" style="display: none;">
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ AM 08:00 - 08:30</div>
+                    <h3 class="item-title">셋째 날 아침</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/1윤목님.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">윤목님이 세빛에?🌟</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/1아침브런치.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">프렌치 토스트 <br> 비주얼 실화?♥</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ AM 08:30 - 09:00</div>
+                    <h3 class="item-title">셋째 날 아침 경건회</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div>
+                            <img src="photo/Day3/1경건회2.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">📙 보다 : 진리로 눈을 뜨다 <br>(열왕기하 6장 14-17절)</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/1경건회1.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">건강체조 연습</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ AM 09:30 - PM 19:40</div>
+                    <h3 class="item-title">교육팀의 하루</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/2교육관출발.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">교육관으로 출발🏃‍♂️</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/2쥰도사님.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">쥰도사님의 성경 캠프</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/2종현과아이들.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">종현과 아이들</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/2슬기와아이들.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">슬기와 아이들</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/2예인이반석.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">예인&반석</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/2린선생님.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">린 선생님~</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/2구름속에 무지개를 두었나니.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">구름 속에 무지개를 두었나니</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/2세은거울샷.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">세은과 아이들</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/2맛있어요.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">맛있어요?!</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/2공놀이.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">뜨거운 태양아래 열정의 공놀이</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/2상우이마에예수님.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">상우 이마에 예수님</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/2말씀암송.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">말씀암송 누가누가 잘하나</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/2기빨린쥰도사님.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">쥰도사님 지쳤나요? 네니오</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ AM 09:30 - PM 19:40</div>
+                    <h3 class="item-title">전도팀의 하루</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/3출발.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">새롭게 짜여진 전도팀 출격</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/3윤목님전도.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">윤목님도 함께!</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/3받은사랑.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">사랑 받기💞</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/3전도준형.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">✨</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/3전도소영.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">전도를 묻거든 소영을 보라</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/3전도마스터종윤.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">전도마스터 종윤</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/3계속되는패킹.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">틈틈이 포장</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/3할무니댁.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">할무니댁 손주들 집합</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/3할무니.PNG" class="polaroid-img">
+                            <div class="polaroid-caption">아프지 마러 할무니</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/3아프지마한재.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">아프지 마러 한재</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/3핸드크림하림.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">언니 손에 핸드크림</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/3wjseh.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">♡</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/3윤목님기도.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">다같이 손잡고 기도</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 14:00 - 15:00</div>
+                    <h3 class="item-title">점심</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/4점심제육.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">점심 : 제육&된장찌개</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/4해준소연부감님.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">더위와 싸우는 주방팀</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/4부감님.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">사랑합니다 부감님</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/4꾸기.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">꾸기도 언능 먹어</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 19:00 - 19:40</div>
+                    <h3 class="item-title">저녁먹자</h3>
+
+                    <div class="polaroid-card">
+                        <div class="tape-deco"></div><img src="photo/Day3/5갈비탕.jpg" class="polaroid-img">
+                        <div class="polaroid-caption">저녁 : 갈비탕<br>체고야</div>
+                    </div>
+
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 20:00 - 21:00</div>
+                    <h3 class="item-title">바다</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/6바다 단체사진.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">우리의 유일한 전원 단체사진</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/6바다경건회.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">바다 경건회 느좋</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/6브로맨스.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">나눔과 마니또 공개도 하고</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/6F4.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">어?F4?</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/6쥰도사님습격사건.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">쥰도사님습격사건</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day3/6바다발담구기.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">♡</div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 22:30 - 00:00</div>
+                    <h3 class="item-title">돌아와서 야식타임</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div>
+                            <img src="photo/Day3/8부감님체고.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">야식 제공해주신 임부감님(부장단)<br>감사하고 사랑합니다💖</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div>
+                            <img src="photo/Day3/8야식.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">꺄</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ AM 00:00 - 01:00</div>
+                    <h3 class="item-title">전체 나눔</h3>
+                    <div class="polaroid-card">
+                        <div class="tape-deco"></div>
+                        <img src="photo/Day3/7전체나눔.JPG" class="polaroid-img">
+                        <div class="polaroid-caption">밤을 잊은 우리들의 전체 나눔</div>
+                    </div>
+                </div>
+
+
+                <!-- ⏩ 여기에 Next Day 버튼 추가 -->
+                <div style="text-align: center; margin: 40px 0 20px 0;">
+                    <button type="button" onclick="changeSubDay(4)"
+                        style="background: var(--poster-blue); color: white; border: none; padding: 12px 24px; font-size: 15px; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-family: 'Apple SD Gothic Neo', sans-serif;">
+                        Next Day (Day 4) →
+                    </button>
+                </div>
+
+            </div> <!-- 👈 feed-day3이 끝나는 닫는 태그 바로 위 -->
+
+            <div class="timeline day-feed" id="feed-day4" style="display: none;">
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ AM 08:00 - 08:40</div>
+                    <h3 class="item-title">마지막 아침</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/1부리또.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">아침: 브리또</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ AM 08:40 - 09:00</div>
+                    <h3 class="item-title">마지막 아침 경건회</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/1경건회1.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">🎶 주가 일하시네 <br> 📙 주다 : 받은것으로 내어주다 <br>(누가복음 6장 35-38절)</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/1체조.JPG" class="polaroid-img">
+                            <div class="polaroid-caption"><br>건강체조 마지막 연습</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">💞</div>
+                    <h3 class="item-title">환영합니다!</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/2픽업1.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💛</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/2픽업2.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">🩶</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/2픽업3.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💚</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/2픽업4.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/2픽업5.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">🩵</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/2픽업6.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">🧡</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ AM 11:00 - PM 12:00</div>
+                    <h3 class="item-title">은혜와 감동의 주일 예배</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/3주일예배1.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">주일 예배 시작!</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/3주일예배2_건강체조.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">특별순서: 건강체조</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/3주일예배2_건강체조2.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">세빛 귀여워,,,💞</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/3주일예배2_특송.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">특별순서: '주를 찾는 모든 자들이' 특송</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/3주일예배2_축복1.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">특별순서: 목사님, 사모님 축복</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/3주일예배2_축복2.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">맏형님도 예쁜 축복손</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/3주일예배2_단체사진.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">세빛 냐호✌🏻</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">✨</div>
+                    <h3 class="item-title">세빛의 주일</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/권사님.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">하림과 권사님💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/김순희님.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">순희할머니💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/성도1.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">두분 진정하세요</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/성도10.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/성도11.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">이기한님💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/성도2.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/성도3.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/성도4.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/성도5.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/성도6.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/삼형제1.PNG" class="polaroid-img">
+                            <div class="polaroid-caption">삼형제 형님들</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/삼형제2.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">삼형제 막내</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/성도와사모님.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/언니야.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/얼굴1.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/얼굴2.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/얼굴3.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/얼굴4.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/얼굴5.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/얼굴6.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/이병철님.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">이병철님💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/정남순님.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">남순할머니💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/성도7.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/성도8.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">채화할머니💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/와주신어르신들/성도9.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">🥄</div>
+                    <h3 class="item-title">최고의 보쌈</h3>
+                    <div class="slider-wrap">
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div>
+                            <img src="photo/Day4/4주방팀체고.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">최고의 보쌈</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/4체고2.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">💗</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/4포토광고.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">🍇</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/4해맑.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">해맑지훈</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/4린해준.jpg" class="polaroid-img">
+                            <div class="polaroid-caption">🥕</div>
+                        </div>
+                        <div class="polaroid-card">
+                            <div class="tape-deco"></div><img src="photo/Day4/4최고의전.JPG" class="polaroid-img">
+                            <div class="polaroid-caption">먹어본 전 중에 1등</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 15:10</div>
+                    <h3 class="item-title">삼척 안녕, 다시 소망교회로</h3>
+                    <div class="polaroid-card">
+                        <div class="tape-deco"></div>
+                        <img src="photo/Day4/5단체사진.JPG" class="polaroid-img">
+                        <div class="polaroid-caption">아쉬운 작별</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 15:10 - 20:15</div>
+                    <h3 class="item-title">휴게소</h3>
+                    <div class="slider-wrap">
+                        <div class="slider-wrap">
+                            <div class="polaroid-card">
+                                <div class="tape-deco"></div><img src="photo/Day4/6첫째아들둘째아들.JPG" class="polaroid-img">
+                                <div class="polaroid-caption">세빛팀 첫째아들 둘째아들</div>
+                            </div>
+                            <div class="polaroid-card">
+                                <div class="tape-deco"></div><img src="photo/Day4/6첫째아들 옆자리.jpg" class="polaroid-img">
+                                <div class="polaroid-caption">그의 비밀 짝꿍</div>
+                            </div>
+                            <div class="polaroid-card">
+                                <div class="tape-deco"></div><img src="photo/Day4/6떡볶이.jpg" class="polaroid-img">
+                                <div class="polaroid-caption">떡볶이</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="time-badge">⏱️ PM 20:15</div>
+                    <h3 class="item-title">소망복귀</h3>
+                    <div class="polaroid-card">
+                        <div class="tape-deco"></div>
+                        <img src="photo/Day4/7소망복귀.JPG" class="polaroid-img">
+                        <div class="polaroid-caption">도착기도</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         🎲 [TAB 2.5] 세빛 퀴즈 페이지
+         ========================================== -->
+        <div id="content-quiz" class="tab-content" style="background-color: #eeeeee; min-height: 100vh;">
+            <h2 style="font-family: 'Gamja Flower'; text-align: center; color: var(--poster-blue); font-size: 28px; margin-bottom: 5px;">🧩 세빛 모의고사</h2>
+            <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin: 0 0 25px 0;">선교 기억 조작 방지! 우리만 아는 미니 퀴즈 🎲</p>
+
+            <!-- 🟢 [스타일 수정] letter-spacing과 line-height를 추가하여 글자 간격을 쫀쫀하게 바꿉니다 -->
+            <div style="background: #ffffff; padding: 20px; border-radius: 12px; border: 1px solid #e0e0e0; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03); font-family: 'Apple SD Gothic Neo', sans-serif; letter-spacing: -0.8px; line-height: 1.35;">
+                
+                <!-- Q1 -->
+                <div class="quiz-block" style="margin-bottom: 25px;">
+                    <p style="font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #333; margin-top: 0;">1. 다음 중 오이 냉국에 들어가지 않은 것은?</p>
+                    <label style="display: block; padding: 10px; margin-bottom: 5px; background: #f9f9f9; border-radius: 6px; cursor: pointer;"><input type="radio" name="q1" value="0"> 포카리스웨트</label>
+                    <label style="display: block; padding: 10px; margin-bottom: 5px; background: #f9f9f9; border-radius: 6px; cursor: pointer;"><input type="radio" name="q1" value="1"> 토마토</label>
+                    <label style="display: block; padding: 10px; margin-bottom: 5px; background: #f9f9f9; border-radius: 6px; cursor: pointer;"><input type="radio" name="q1" value="0"> 국자</label>
+                </div>
+
+                <!-- Q2 -->
+                <div class="quiz-block" style="margin-bottom: 25px;">
+                    <p style="font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #333;">2. 교육팀 말씀 암송 (창 9:13). 다음 중 정확한 말씀을 고르시오.</p>
+                    <label style="display: block; padding: 10px; margin-bottom: 5px; background: #f9f9f9; border-radius: 6px; cursor: pointer;"><input type="radio" name="q2" value="0"> 내가 내 무지개를 여기에 두었나니 이것이 나와 세상 사이의 언약의 증거니라</label>
+                    <label style="display: block; padding: 10px; margin-bottom: 5px; background: #f9f9f9; border-radius: 6px; cursor: pointer;"><input type="radio" name="q2" value="0"> 내가 내 무지개를 하늘에 두었나니 이것이 너와 나 사이의 영원한 언약의 증거니라</label>
+                    <label style="display: block; padding: 10px; margin-bottom: 5px; background: #f9f9f9; border-radius: 6px; cursor: pointer;"><input type="radio" name="q2" value="1"> 내가 내 무지개를 구름 속에 두었나니 이것이 나와 세상 사이의 언약의 증거니라</label>
+                </div>
+
+                <!-- Q3 -->
+                <div class="quiz-block" style="margin-bottom: 25px;">
+                    <p style="font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #333;">3. 전도팀이 사역 중 주민들께 받은 사랑이 아닌 것은?</p>
+                    <label style="display: block; padding: 10px; margin-bottom: 5px; background: #f9f9f9; border-radius: 6px; cursor: pointer;"><input type="radio" name="q3" value="0"> 꿀물</label>
+                    <label style="display: block; padding: 10px; margin-bottom: 5px; background: #f9f9f9; border-radius: 6px; cursor: pointer;"><input type="radio" name="q3" value="1"> 포카리 스웨트</label>
+                    <label style="display: block; padding: 10px; margin-bottom: 5px; background: #f9f9f9; border-radius: 6px; cursor: pointer;"><input type="radio" name="q3" value="0"> 수박</label>
+                </div>
+
+                <button type="button" onclick="checkQuiz()" style="width: 100%; height: 45px; background: var(--poster-blue); color: white; border: none; font-weight: bold; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 10px; letter-spacing: -0.5px;">채점하기 💯</button>
+                
+                <div id="quiz-result" style="display: none; margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 16px;"></div>
+            </div>
+        </div>
+
+
+    <div id="content-guestbook" class="tab-content">
+        <h2
+            style="font-family: 'Gamja Flower'; text-align: center; color: var(--poster-blue); font-size: 28px; margin-bottom: 5px;">
+            세빛을 향한 기도의 벽</h2>
+        <p style="text-align: center; font-size: 13px; color: var(--text-muted); margin: 0 0 25px 0;">따뜻한 방명록도, 세빛을 향한
+            그리운 기도제목도 모두 환영합니다. 🙏</p>
+
+        <div class="input-section">
+            <div class="input-row-top">
+                <input id="name-input" class="custom-input" placeholder="닉네임">
+                <input id="password-input" type="password" class="custom-input" placeholder="비번(4자)" maxlength="4">
+                <select id="emoji-select" class="custom-input">
+                    <option value="🙏">🙏 기도</option>
+                    <option value="🌱">🌱 새싹</option>
+                    <option value="❤️">❤️ 하트</option>
+                    <option value="💌">💌 편지</option>
+                    <option value="✨">✨ 반짝</option>
+                </select>
+            </div>
+            <div class="input-row-bottom">
+                <input id="message-input" class="custom-input" placeholder="소중한 기도나 추억 한마디를 적어주세요...">
+                <button id="submit-button" class="custom-input" type="button">등록</button>
+            </div>
+        </div>
+
+        <ul id="guestbook-list"></ul>
+    </div>
+
+    <!-- 🟢 [수정] 하단 고정 탭 바 내비게이션 (퀴즈 추가 버전) -->
+    <nav class="main-nav-bar">
+        <button class="nav-btn active" id="btn-home" onclick="switchTab('home')">
+            <span class="icon">🏠</span><span>홈</span>
+        </button>
+        <button class="nav-btn" id="btn-team" onclick="switchTab('team')">
+            <span class="icon">👥</span><span>팀원들</span>
+        </button>
+        <button class="nav-btn" id="btn-diary" onclick="switchTab('diary')">
+            <span class="icon">📸</span><span>사역일지</span>
+        </button>
+        <!-- ⏩ 새로 추가되는 퀴즈 버튼 -->
+        <button class="nav-btn" id="btn-quiz" onclick="switchTab('quiz')">
+            <span class="icon">🎲</span><span>세빛퀴즈</span>
+        </button>
+        <button class="nav-btn" id="btn-guestbook" onclick="switchTab('guestbook')">
+            <span class="icon">📝</span><span>기도의벽</span>
+        </button>
+    </nav>
+
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <img class="modal-content" id="zoomedImg">
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(`content-${tabId}`).classList.add('active');
+            document.getElementById(`btn-${tabId}`).classList.add('active');
+
+            // 기도의 벽이나 퀴즈 같은 absolute 탭 전환 시 상단 스크롤 리셋
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function checkQuiz() {
+            let score = 0;
+            
+            // 라디오 버튼 선택 값 체크
+            const q1 = document.querySelector('input[name="q1"]:checked');
+            const q2 = document.querySelector('input[name="q2"]:checked');
+            const q3 = document.querySelector('input[name="q3"]:checked');
+
+            if (!q1 || !q2 || !q3) {
+                alert("아직 안 푼 문제가 있어요! 모든 칸을 선택해 주세요.");
+                return;
+            }
+
+            // 정답 합산 (value="1"이 정답)
+            score += parseInt(q1.value);
+            score += parseInt(q2.value);
+            score += parseInt(q3.value);
+
+            const resultDiv = document.getElementById('quiz-result');
+            resultDiv.style.display = 'block';
+
+            // 점수별 결과 멘트 커스텀
+            if (score === 3) {
+                resultDiv.style.background = '#e6f4ea';
+                resultDiv.style.color = '#137333';
+                resultDiv.innerHTML = `🎉 3/3 만점! 찐세빛팀 인정 💫<br><span style="font-size:13px; font-weight:normal;">당신은 오이냉국 식초 냄새까지 기억하는 선교 마스터!</span>`;
+            } else if (score >= 1) {
+                resultDiv.style.background = '#fef7e0';
+                resultDiv.style.color = '#b06000';
+                resultDiv.innerHTML = `👍 ${score}/3 맞춤! 아쉬운 기억력 ☺️<br><span style="font-size:13px; font-weight:normal;">사역일지 탭에 가서 추억을 다시 복습하고 오세요!</span>`;
+            } else {
+                resultDiv.style.background = '#fce8e6';
+                resultDiv.style.color = '#c5221f';
+                resultDiv.innerHTML = `🚨 0/3 전원 오답! 몸만 다녀왔나요? 🤔<br><span style="font-size:13px; font-weight:normal;">당장 드라이브 링크 버튼 누르고 사진 정독하고 오기!</span>`;
+            }
+        }
+
+        function changeSubDay(dayNumber) {
+            const subTabs = document.querySelectorAll('.sub-tab');
+            subTabs.forEach((tab, index) => {
+                if (index === (dayNumber - 1)) tab.classList.add('active');
+                else tab.classList.remove('active');
+            });
+
+            document.getElementById('feed-day1').style.display = 'none';
+            document.getElementById('feed-day2').style.display = 'none';
+            document.getElementById('feed-day3').style.display = 'none';
+            document.getElementById('feed-day4').style.display = 'none';
+
+            if (dayNumber === 1) document.getElementById('feed-day1').style.display = 'block';
+            else if (dayNumber === 2) document.getElementById('feed-day2').style.display = 'block';
+            else if (dayNumber === 3) document.getElementById('feed-day3').style.display = 'block';
+            else if (dayNumber === 4) document.getElementById('feed-day4').style.display = 'block';
+
+            // 🟢 [추가] 다음 일차로 넘어갈 때 상단 탭 위치로 스크롤을 부드럽게 올려줍니다!
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("zoomedImg");
+
+        function zoomImage(imgElement) {
+            modal.classList.add("show");
+            modalImg.src = imgElement.src;
+        }
+        function closeModal() {
+            modal.classList.remove("show");
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeFOdZHwCrhmzEp46qebk5hSnR8qldJlI",
+            authDomain: "sebit-f99a0.firebaseapp.com",
+            projectId: "sebit-f99a0",
+            storageBucket: "sebit-f99a0.firebasestorage.app",
+            messagingSenderId: "528866887124",
+            appId: "1:528866887124:web:915cff3ec16d0e27cc0241",
+            measurementId: "G-91QSFEM3TT"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const prayersRef = ref(database, 'sebit-prayers');
+
+        const submitBtn = document.getElementById('submit-button');
+        submitBtn.addEventListener('click', () => {
+            const name = document.getElementById('name-input').value;
+            const pw = document.getElementById('password-input').value;
+            const message = document.getElementById('message-input').value;
+            const emoji = document.getElementById('emoji-select').value;
+
+            if (name.trim() !== "" && message.trim() !== "" && pw.trim() !== "") {
+                push(prayersRef, {
+                    name: name,
+                    password: pw,
+                    message: message,
+                    emoji: emoji,
+                    timestamp: Date.now()
+                }).then(() => {
+                    document.getElementById('name-input').value = "";
+                    document.getElementById('password-input').value = "";
+                    document.getElementById('message-input').value = "";
+                }).catch((error) => {
+                    alert("서버 저장에 실패했습니다.");
+                    console.error(error);
+                });
+            } else {
+                alert("모든 빈칸을 채워주세요!");
+            }
+        });
+
+        const listElement = document.getElementById('guestbook-list');
+        onValue(prayersRef, (snapshot) => {
+            listElement.innerHTML = "";
+            const data = snapshot.val();
+
+            if (data) {
+                Object.entries(data).reverse().forEach(([key, item]) => {
+                    let dateStr = "";
+                    if (item.timestamp) {
+                        const d = new Date(item.timestamp);
+                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                        const date = String(d.getDate()).padStart(2, '0');
+                        const hours = String(d.getHours()).padStart(2, '0');
+                        const minutes = String(d.getMinutes()).padStart(2, '0');
+                        dateStr = `${month}/${date} ${hours}:${minutes}`;
+                    }
+
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                    <span class="list-emoji">${item.emoji}</span>
+                    <div style="display: flex; flex-direction: column; align-items: center; margin-right: 12px; padding-right: 12px; border-right: 1px solid #eee; min-width: 65px; box-sizing: border-box;">
+                        <span class="list-name" style="margin: 0; padding: 0; border: none; min-width: auto; text-align: center; display: block; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.name}</span>
+                        <span style="font-size: 10px; color: #b5b5b5; margin-top: 1px; white-space: nowrap; font-family: 'Apple SD Gothic Neo', sans-serif; font-weight: normal;">${dateStr}</span>
+                    </div>
+                    <span class="list-msg">${item.message}</span>
+                    <button class="delete-btn" data-id="${key}">✕</button>
+                `;
+                    listElement.appendChild(li);
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.onclick = () => {
+                        const id = btn.getAttribute('data-id');
+                        const savedPw = String(data[id].password);
+                        const adminPw = "1977";
+
+                        const inputPw = prompt("글을 삭제하시려면 비밀번호를 입력해 주세요.");
+                        if (inputPw === null) return;
+
+                        if (inputPw === adminPw || inputPw === savedPw) {
+                            if (confirm("확인되었습니다. 이 기도제목을 서버에서 삭제할까요?")) {
+                                remove(ref(database, 'sebit-prayers/' + id))
+                                    .then(() => alert("성공적으로 삭제되었습니다."))
+                                    .catch((err) => console.error("삭제 실패:", err));
+                            }
+                        } else {
+                            alert("비밀번호가 일치하지 않습니다!");
+                        }
+                    };
+                });
+            } else {
+                listElement.innerHTML = "<li style='justify-content: center; color: #999; font-size: 14px;'>🙏 첫 번째 기도 제목을 남겨주세요!</li>";
+            }
+        });
+    </script>
+</body>
+
+</html>
